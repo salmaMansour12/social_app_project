@@ -1,0 +1,248 @@
+
+<nav class="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+
+    <!-- LOGO -->
+
+    <a
+      routerLink="/home"
+      class="flex shrink-0 items-center gap-2"
+      (click)="closeDropdowns()"
+    >
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-xl font-extrabold text-white">
+        S
+      </div>
+
+      <span class="hidden text-xl font-bold text-gray-800 sm:block">
+        Socially
+      </span>
+    </a>
+
+
+    <!-- MAIN NAVIGATION -->
+
+    <div class="flex items-center gap-1 sm:gap-3">
+
+      <!-- HOME -->
+
+      <a
+        routerLink="/home"
+        routerLinkActive="bg-purple-50 text-purple-700"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-purple-50 hover:text-purple-700"
+        (click)="closeDropdowns()"
+      >
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="hidden md:inline">Home</span>
+      </a>
+
+
+      <!-- PROFILE -->
+
+      <a
+        routerLink="/my-profile"
+        routerLinkActive="bg-purple-50 text-purple-700"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-purple-50 hover:text-purple-700"
+        (click)="closeDropdowns()"
+      >
+        <i class="fa-regular fa-user text-lg"></i>
+        <span class="hidden md:inline">Profile</span>
+      </a>
+
+
+      <!-- NOTIFICATIONS -->
+
+     
+<a
+  routerLink="/notification"
+  routerLinkActive="text-violet-700"
+  class="relative flex items-center gap-2 rounded-xl px-3 py-2 text-gray-600 transition hover:bg-violet-50 hover:text-violet-700"
+>
+  <span class="relative">
+    <i class="fa-regular fa-bell text-xl"></i>
+
+    @if ((unreadCount$ | async) ?? 0; as count) {
+      @if (count > 0) {
+        <span
+          class="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[9px] font-extrabold text-white"
+        >
+          {{ count > 99 ? '99+' : count }}
+        </span>
+      }
+    }
+  </span>
+
+  <span class="hidden sm:inline">Notifications</span>
+</a>
+
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+
+    <div class="flex items-center gap-2">
+
+      <!-- PROFILE DROPDOWN -->
+
+      <div class="relative">
+
+        <button
+          type="button"
+          (click)="toggleProfileDropdown()"
+          [attr.aria-expanded]="profileDropdownOpen"
+          class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-2 transition hover:border-purple-300 hover:bg-purple-50"
+        >
+
+          <img
+            [src]="profilePhoto"
+            [alt]="profileName"
+            class="h-8 w-8 rounded-full border border-purple-100 object-cover"
+          />
+
+          <span class="hidden max-w-28 truncate text-sm font-semibold text-gray-700 lg:block">
+            {{ profileName }}
+          </span>
+
+          <i
+            class="fa-solid fa-chevron-down hidden text-xs text-gray-500 transition sm:block"
+            [class.rotate-180]="profileDropdownOpen"
+          ></i>
+
+        </button>
+
+
+        <!-- PROFILE DROPDOWN CONTENT -->
+
+        @if (profileDropdownOpen) {
+
+          <div class="absolute right-0 top-full mt-3 w-64 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
+
+            <!-- USER INFO -->
+
+            <div class="flex items-center gap-3 border-b border-gray-100 p-4">
+
+              <img
+                [src]="profilePhoto"
+                [alt]="profileName"
+                class="h-12 w-12 rounded-full border-2 border-purple-100 object-cover"
+              />
+
+              <div class="min-w-0">
+
+                <p class="truncate text-sm font-bold text-gray-800">
+                  {{ profileName }}
+                </p>
+
+                <p class="text-xs text-gray-500">
+                  View your profile
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- DROPDOWN LINKS -->
+
+            <div class="p-2">
+
+              <a
+                routerLink="/my-profile"
+                (click)="closeDropdowns()"
+                class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-700 transition hover:bg-purple-50 hover:text-purple-700"
+              >
+                <i class="fa-regular fa-user w-5"></i>
+                View Profile
+              </a>
+
+
+              <a
+                routerLink="/settings"
+                (click)="closeDropdowns()"
+                class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-700 transition hover:bg-purple-50 hover:text-purple-700"
+              >
+                <i class="fa-regular fa-pen-to-square w-5"></i>
+                Edit Profile
+              </a>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- HAMBURGER MENU -->
+
+      <div class="relative">
+
+        <button
+          type="button"
+          (click)="toggleMenuDropdown()"
+          [attr.aria-expanded]="menuDropdownOpen"
+          aria-label="Open menu"
+          class="flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 text-gray-700 transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700"
+        >
+
+          <i
+            class="fa-solid fa-bars text-lg transition"
+            [class.rotate-90]="menuDropdownOpen"
+          ></i>
+
+        </button>
+
+
+        <!-- MENU DROPDOWN CONTENT -->
+
+        @if (menuDropdownOpen) {
+
+          <div class="absolute right-0 top-full mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white p-2 shadow-xl">
+
+            <a
+              routerLink="/my-profile"
+              (click)="closeDropdowns()"
+              class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-700 transition hover:bg-purple-50 hover:text-purple-700"
+            >
+              <i class="fa-regular fa-user w-5"></i>
+              Profile
+            </a>
+
+
+            <a
+              routerLink="/settings"
+              (click)="closeDropdowns()"
+              class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-gray-700 transition hover:bg-purple-50 hover:text-purple-700"
+            >
+              <i class="fa-solid fa-gear w-5"></i>
+              Settings
+            </a>
+
+
+            <div class="my-2 border-t border-gray-100"></div>
+
+
+            <button
+              type="button"
+              (click)="logoutnavbar()"
+              class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
+            >
+              <i class="fa-solid fa-right-from-bracket w-5"></i>
+              Log Out
+            </button>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+</nav>

@@ -1,0 +1,296 @@
+
+<aside class="sticky top-20 h-[calc(100vh-6rem)] self-start space-y-6 overflow-y-auto pb-4">
+  <!-- Friends Section -->
+
+  @if (friends().length > 0) {
+
+    <button
+      (click)="openFriends()"
+      class="flex w-full items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:border-purple-200 hover:shadow-md"
+    >
+
+      <span class="flex items-center gap-3">
+
+        <span
+          class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600"
+        >
+          <i class="fa-solid fa-user-group"></i>
+        </span>
+
+        <span class="text-sm font-bold text-gray-800">
+          Friends
+        </span>
+
+      </span>
+
+      <span class="flex items-center gap-2">
+
+        <span class="text-xs text-gray-400">
+          {{ friends().length }}
+        </span>
+
+        <i class="fa-solid fa-chevron-right text-sm text-gray-400"></i>
+
+      </span>
+
+    </button>
+
+  }
+
+  <!-- Suggestions Section -->
+
+  <section
+    class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+  >
+
+    <div class="mb-5">
+
+      <h2 class="text-lg font-bold text-gray-800">
+        People You May Know
+      </h2>
+
+      <p class="mt-1 text-xs text-gray-400">
+        Discover new people
+      </p>
+
+    </div>
+
+    <!-- Loading -->
+
+    @if (isLoading()) {
+
+      <div class="flex flex-col items-center gap-3 py-6">
+
+        <i class="fa-solid fa-spinner fa-spin text-xl text-purple-600"></i>
+
+        <p class="text-sm text-gray-400">
+          Loading suggestions...
+        </p>
+
+      </div>
+
+    }
+
+    <!-- Error -->
+
+    @else if (errorMessage()) {
+
+      <div class="py-5 text-center">
+
+        <i class="fa-solid fa-circle-exclamation text-2xl text-red-400"></i>
+
+        <p class="mt-2 text-sm text-red-500">
+          {{ errorMessage() }}
+        </p>
+
+        <button
+          (click)="getSuggestions()"
+          class="mt-3 rounded-lg bg-purple-100 px-4 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-200"
+        >
+          Try Again
+        </button>
+
+      </div>
+
+    }
+
+    <!-- Empty State -->
+
+    @else if (suggestions().length === 0) {
+
+      <div class="py-6 text-center">
+
+        <i class="fa-solid fa-users text-3xl text-gray-300"></i>
+
+        <p class="mt-3 text-sm text-gray-400">
+          No suggestions available.
+        </p>
+
+      </div>
+
+    }
+
+    <!-- Suggestions List -->
+
+    @else {
+
+      <div class="space-y-4">
+
+        @for (friend of suggestions(); track friend._id) {
+
+          <div class="flex items-center gap-3">
+
+            <img
+              [src]="friend.photo || 'assets/images/default-avatar.png'"
+              [alt]="friend.name"
+              class="h-11 w-11 rounded-full border border-purple-100 object-cover"
+            />
+
+            <div class="min-w-0 flex-1">
+
+              <h3 class="truncate text-sm font-semibold text-gray-800">
+                {{ friend.name }}
+              </h3>
+
+              <p class="text-xs text-gray-400">
+                Suggested for you
+              </p>
+
+            </div>
+
+            <!-- Follow Button -->
+
+            <button
+              (click)="toggleFollow(friend._id)"
+              [disabled]="isFollowLoading(friend._id)"
+              class="rounded-lg px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+              [class.bg-purple-600]="!isFollowing(friend._id)"
+              [class.text-white]="!isFollowing(friend._id)"
+              [class.hover:bg-purple-700]="!isFollowing(friend._id)"
+              [class.bg-purple-100]="isFollowing(friend._id)"
+              [class.text-purple-700]="isFollowing(friend._id)"
+            >
+
+              @if (isFollowLoading(friend._id)) {
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+              } @else {
+
+                {{ isFollowing(friend._id) ? 'Following' : 'Follow' }}
+
+              }
+
+            </button>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+</aside>
+
+
+<!-- ========================= -->
+<!-- Friends Modal -->
+<!-- ========================= -->
+
+@if (showAllFriends) {
+
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="closeFriends()"
+  >
+
+    <div
+      class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- Modal Header -->
+
+      <div class="mb-6 flex items-center justify-between">
+
+        <div>
+
+          <h2 class="text-xl font-bold text-gray-800">
+            All Friends
+          </h2>
+
+          <p class="mt-1 text-sm text-gray-400">
+            Your friends list ({{ friends().length }})
+          </p>
+
+        </div>
+
+        <button
+          (click)="closeFriends()"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-purple-100 hover:text-purple-600"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
+
+      <!-- Friends List -->
+
+      <div class="max-h-[400px] space-y-3 overflow-y-auto">
+
+        @for (friend of friends(); track friend._id) {
+
+          <div
+            class="flex items-center gap-3 rounded-xl p-3 transition hover:bg-gray-50"
+          >
+
+            <img
+              [src]="friend.photo || 'assets/images/default-avatar.png'"
+              [alt]="friend.name"
+              class="h-12 w-12 rounded-full border border-purple-100 object-cover"
+            />
+
+            <div>
+
+              <h3 class="font-semibold text-gray-800">
+                {{ friend.name }}
+              </h3>
+
+              <p class="text-xs text-gray-400">
+                Friend
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ========================= -->
+<!-- Toast Notification -->
+<!-- ========================= -->
+
+@if (toastMessage()) {
+
+  <div
+    class="fixed right-5 top-5 z-[10000] flex max-w-[calc(100vw-40px)] items-center gap-3 rounded-2xl border p-4 shadow-xl"
+    [class.bg-green-50]="toastType() === 'success'"
+    [class.border-green-200]="toastType() === 'success'"
+    [class.text-green-700]="toastType() === 'success'"
+    [class.bg-red-50]="toastType() === 'error'"
+    [class.border-red-200]="toastType() === 'error'"
+    [class.text-red-700]="toastType() === 'error'"
+  >
+
+    <i
+      class="fa-solid text-lg"
+      [class.fa-circle-check]="toastType() === 'success'"
+      [class.fa-circle-exclamation]="toastType() === 'error'"
+    ></i>
+
+    <span class="text-sm font-semibold">
+      {{ toastMessage() }}
+    </span>
+
+    <button
+      (click)="closeToast()"
+      class="ml-2 transition hover:opacity-60"
+    >
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+  </div>
+
+}

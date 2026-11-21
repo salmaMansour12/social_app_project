@@ -1,3 +1,119 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+
+html.dark,
+html.dark body {
+  background-color: #0d1017 !important;
+  color: #e5e7eb;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Main background - One unified color */
+html.dark [class~="bg-[#f0f2f5]"],
+html.dark .bg-gray-100,
+html.dark .bg-gray-50,
+html.dark .bg-white {
+  background-color: #0d1017 !important;
+}
+
+/* Remove separated card appearance */
+html.dark .shadow-sm,
+html.dark .shadow-md,
+html.dark .shadow-lg,
+html.dark .shadow-xl {
+  box-shadow: none !important;
+}
+
+/* Borders - very subtle */
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+  border-color: #1c2330 !important;
+}
+
+/* Text */
+html.dark .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-gray-400 {
+  color: #8290a5 !important;
+}
+
+/* Inputs */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #151b26 !important;
+  color: #f8fafc !important;
+  border-color: #30394a !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #8793a6 !important;
+}
+
+/* Hover */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover {
+  background-color: #151b26 !important;
+}
+
+/* Violet theme */
+html.dark .bg-violet-50 {
+  background-color: #211b32 !important;
+}
+
+html.dark .bg-violet-100 {
+  background-color: #302443 !important;
+}
+
+html.dark .text-violet-600 {
+  color: #b69aff !important;
+}
+
+html.dark .text-violet-700 {
+  color: #c4aaff !important;
+}
+
+html.dark .border-violet-200 {
+  border-color: #554078 !important;
+}
+
+/* Dividers */
+html.dark hr {
+  border-color: #1c2330 !important;
+}
+
+/* Keep primary buttons colored */
+html.dark .bg-purple-600,
+html.dark .bg-violet-600 {
+  background-color: #7c3aed !important;
+}/* Unified Home Background in Dark Mode */
+html.dark .home-page {
+  background-color: #0d1017 !important;
+}
+
+/* Make all home sections blend with the page */
+html.dark app-home-left,
+html.dark app-home-center,
+html.dark app-home-right {
+  background-color: transparent !important;
+}
+
+
+

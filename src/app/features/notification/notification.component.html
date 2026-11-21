@@ -1,0 +1,315 @@
+
+<div class="min-h-screen bg-[#f0f2f5] px-4 py-8 sm:px-6 lg:px-8">
+
+  <div class="mx-auto max-w-4xl">
+
+    <!-- Header -->
+    <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+
+      <div>
+        <div class="mb-2 flex items-center gap-3">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-2xl text-violet-600">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+
+          <div>
+            <h1 class="text-2xl font-extrabold text-gray-900 sm:text-3xl">
+              Notifications
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500">
+              Stay updated with what's happening
+            </p>
+          </div>
+        </div>
+      </div>
+
+      @if (unreadCount > 0) {
+        <div class="flex items-center gap-2 rounded-full bg-violet-100 px-4 py-2 text-sm font-bold text-violet-700">
+          <span class="h-2 w-2 rounded-full bg-violet-600"></span>
+          {{ unreadCount }} unread
+        </div>
+      }
+
+    </div>
+
+    <!-- Main Card -->
+    <div class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
+
+      <!-- Card Header -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-5 py-5 sm:px-7">
+
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">
+            Your Notifications
+          </h2>
+
+          <p class="mt-1 text-sm text-gray-500">
+            All your latest activities in one place
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="markAllAsRead()"
+          [disabled]="unreadCount === 0 || isMarkingAll"
+          class="flex items-center gap-2 rounded-xl bg-violet-50 px-4 py-2.5 text-sm font-bold text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          @if (isMarkingAll) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+          } @else {
+            <i class="fa-solid fa-check-double"></i>
+          }
+
+          Mark all as read
+        </button>
+
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex items-center gap-2 border-b border-gray-100 px-5 pt-4 sm:px-7">
+
+        <button
+          type="button"
+          (click)="setActiveTab('all')"
+          class="relative rounded-t-xl px-5 py-3 text-sm font-bold transition"
+          [class.bg-violet-50]="activeTab === 'all'"
+          [class.text-violet-700]="activeTab === 'all'"
+          [class.text-gray-500]="activeTab !== 'all'"
+        >
+          All
+
+          @if (activeTab === 'all') {
+            <span class="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-violet-600"></span>
+          }
+        </button>
+
+        <button
+          type="button"
+          (click)="setActiveTab('unread')"
+          class="relative flex items-center gap-2 rounded-t-xl px-5 py-3 text-sm font-bold transition"
+          [class.bg-violet-50]="activeTab === 'unread'"
+          [class.text-violet-700]="activeTab === 'unread'"
+          [class.text-gray-500]="activeTab !== 'unread'"
+        >
+          Unread
+
+          @if (unreadCount > 0) {
+            <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-600 px-1.5 text-[10px] font-extrabold text-white">
+              {{ unreadCount }}
+            </span>
+          }
+
+          @if (activeTab === 'unread') {
+            <span class="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-violet-600"></span>
+          }
+        </button>
+
+      </div>
+
+      <!-- Loading -->
+      @if (isLoading) {
+        <div class="space-y-4 p-6">
+
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="flex animate-pulse items-center gap-4 rounded-2xl p-4">
+
+              <div class="h-12 w-12 shrink-0 rounded-full bg-gray-200"></div>
+
+              <div class="flex-1 space-y-2">
+                <div class="h-3 w-1/3 rounded bg-gray-200"></div>
+                <div class="h-3 w-2/3 rounded bg-gray-100"></div>
+              </div>
+
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- Notifications List -->
+      @if (!isLoading && visibleNotifications.length > 0) {
+
+        <div class="divide-y divide-gray-100">
+
+          @for (notification of visibleNotifications; track notification._id) {
+
+            <div
+              class="group flex cursor-pointer items-start gap-3 px-5 py-5 transition hover:bg-violet-50/50 sm:gap-4 sm:px-7"
+              [class.bg-violet-50]="isUnread(notification)"
+              [class.bg-white]="!isUnread(notification)"
+              (click)="markAsRead(notification)"
+            >
+
+              <!-- User Photo -->
+              <div class="relative shrink-0">
+
+                <img
+                  [src]="getActorPhoto(notification)"
+                  [alt]="getActorName(notification)"
+                  class="h-12 w-12 rounded-full border-2 border-white object-cover shadow-sm sm:h-14 sm:w-14"
+                />
+
+                <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-violet-600 text-xs text-white">
+                  {{ getNotificationIcon(notification) }}
+                </span>
+
+              </div>
+
+              <!-- Notification Content -->
+              <div class="min-w-0 flex-1 pt-1">
+
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+
+                  <p class="text-sm leading-6 text-gray-800 sm:text-base">
+                    <span class="font-extrabold text-gray-900">
+                      {{ getActorName(notification) }}
+                    </span>
+
+                    <span class="ml-1">
+                      {{ getNotificationMessage(notification) }}
+                    </span>
+                  </p>
+
+                  @if (isUnread(notification)) {
+                    <span class="h-2 w-2 shrink-0 rounded-full bg-violet-600"></span>
+                  }
+
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-center gap-3">
+
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-gray-400">
+                    <i class="fa-regular fa-clock"></i>
+                    {{ getTime(notification.createdAt) }}
+                  </span>
+
+                  @if (isUnread(notification)) {
+                    <span class="text-xs font-bold text-violet-600">
+                      New
+                    </span>
+                  } @else {
+                    <span class="text-xs font-medium text-gray-400">
+                      Read
+                    </span>
+                  }
+
+                </div>
+
+              </div>
+
+              <!-- Read Action -->
+              @if (isUnread(notification)) {
+
+                <button
+                  type="button"
+                  title="Mark as read"
+                  [disabled]="loadingNotificationId === notification._id"
+                  (click)="$event.stopPropagation(); markAsRead(notification)"
+                  class="mt-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-gray-400 transition hover:bg-violet-100 hover:text-violet-700 disabled:opacity-50"
+                >
+                  @if (loadingNotificationId === notification._id) {
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                  } @else {
+                    <i class="fa-solid fa-check"></i>
+                  }
+                </button>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+      <!-- Empty State -->
+      @if (!isLoading && visibleNotifications.length === 0) {
+
+        <div class="flex flex-col items-center justify-center px-5 py-20 text-center">
+
+          <div class="mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-violet-50 text-4xl text-violet-500">
+            <i class="fa-regular fa-bell-slash"></i>
+          </div>
+
+          @if (activeTab === 'unread') {
+
+            <h3 class="text-xl font-extrabold text-gray-800">
+              You're all caught up!
+            </h3>
+
+            <p class="mt-2 max-w-sm text-sm leading-6 text-gray-500">
+              You don't have any unread notifications right now.
+            </p>
+
+            <button
+              type="button"
+              (click)="setActiveTab('all')"
+              class="mt-6 rounded-xl bg-violet-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-violet-700"
+            >
+              View all notifications
+            </button>
+
+          } @else {
+
+            <h3 class="text-xl font-extrabold text-gray-800">
+              No notifications yet
+            </h3>
+
+            <p class="mt-2 max-w-sm text-sm leading-6 text-gray-500">
+              When someone likes, comments on, or interacts with your posts, you'll see it here.
+            </p>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+    <!-- Footer -->
+    @if (!isLoading && notifications.length > 0) {
+      <p class="mt-5 text-center text-xs text-gray-400">
+        You're all caught up with your notifications
+      </p>
+    }
+
+  </div>
+
+</div>
+
+<!-- Toast -->
+@if (toastMessage) {
+  <div
+    class="fixed right-5 top-5 z-[9999] flex max-w-sm items-center gap-3 rounded-2xl border p-4 shadow-xl"
+    [class.bg-green-50]="toastType === 'success'"
+    [class.border-green-200]="toastType === 'success'"
+    [class.text-green-700]="toastType === 'success'"
+    [class.bg-red-50]="toastType === 'error'"
+    [class.border-red-200]="toastType === 'error'"
+    [class.text-red-700]="toastType === 'error'"
+  >
+    <i
+      class="text-lg"
+      [class.fa-solid]="true"
+      [class.fa-circle-check]="toastType === 'success'"
+      [class.fa-circle-exclamation]="toastType === 'error'"
+    ></i>
+
+    <p class="text-sm font-bold">
+      {{ toastMessage }}
+    </p>
+
+    <button
+      type="button"
+      (click)="toastMessage = ''"
+      class="ml-2 opacity-60 hover:opacity-100"
+    >
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+}
+

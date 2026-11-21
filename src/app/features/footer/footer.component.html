@@ -1,0 +1,37 @@
+  <div class="mt-5 flex items-center justify-between gap-3 text-xs sm:text-sm">
+          <a href="#" class="font-medium text-slate-500 hover:text-violet-700">
+            Change Password
+          </a>
+          <a href="#" class="font-semibold text-violet-700 hover:text-fuchsia-600">
+            Forgot Password?
+          </a>
+        </div>
+
+        <div class="my-6 flex items-center gap-3">
+          <span class="h-px flex-1 bg-slate-200"></span>
+          <span class="text-xs text-slate-400">OR SIGN UP WITH</span>
+          <span class="h-px flex-1 bg-slate-200"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button"
+            class="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <span class="font-black text-blue-600">G</span>
+            Google
+          </button>
+
+          <button type="button"
+            class="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" aria-hidden="true">
+              <path d="M16.37 12.2c.03 3.2 2.81 4.26 2.84 4.28-.02.08-.44 1.5-1.45 2.96-.87 1.25-1.77 2.5-3.18 2.53-1.39.03-1.84-.82-3.43-.82-1.6 0-2.1.8-3.41.85-1.36.05-2.39-1.36-3.26-2.6-1.78-2.56-3.14-7.24-1.31-10.4a5.05 5.05 0 0 1 4.27-2.59c1.33-.02 2.58.9 3.4.9.82 0 2.35-1.12 3.96-.95.67.03 2.56.27 3.77 2.05-.1.06-2.25 1.31-2.22 3.79ZM13.77 4.75A5.02 5.02 0 0 0 14.92 1a5.1 5.1 0 0 0-3.31 1.7 4.75 4.75 0 0 0-1.18 3.65 4.22 4.22 0 0 0 3.34-1.6Z"/>
+            </svg>
+            Apple
+          </button>
+        </div>
+
+        <p class="mt-6 text-center text-sm text-slate-500">
+          {{ message }}
+          <a href="{{ linkUrl }}" class="font-bold text-violet-700 hover:underline">
+            {{ linkText }}
+          </a>
+        </p>

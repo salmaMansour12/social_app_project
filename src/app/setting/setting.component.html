@@ -1,0 +1,689 @@
+<div class="min-h-screen bg-[#f0f2f5] px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <!-- TOAST -->
+    @if (toastMessage) {
+      <div
+        class="fixed right-5 top-5 z-[9999] flex max-w-sm items-center gap-3 rounded-2xl border p-4 shadow-xl"
+        [class.bg-green-50]="toastType === 'success'"
+        [class.border-green-200]="toastType === 'success'"
+        [class.text-green-700]="toastType === 'success'"
+        [class.bg-red-50]="toastType === 'error'"
+        [class.border-red-200]="toastType === 'error'"
+        [class.text-red-700]="toastType === 'error'"
+      >
+        <i
+          class="fa-solid"
+          [class.fa-circle-check]="toastType === 'success'"
+          [class.fa-circle-exclamation]="toastType === 'error'"
+        ></i>
+        <p class="text-sm font-bold">{{ toastMessage }}</p>
+        <button type="button" (click)="toastMessage = ''" class="ml-auto">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    }
+
+    <!-- PAGE HEADER -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-600"
+        >
+          <i class="fa-solid fa-gear text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold text-gray-900 sm:text-3xl">Settings</h1>
+          <p class="mt-1 text-sm text-gray-500">Manage your account, preferences and security</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS LAYOUT -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <!-- SIDEBAR -->
+      <aside class="lg:col-span-4 xl:col-span-3">
+        <div class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
+          <!-- PROFILE INFO -->
+          <div class="border-b border-gray-100 p-6 text-center">
+            <div class="relative mx-auto mb-3 h-20 w-20">
+              <img
+                [src]="
+                  previewPhoto ||
+                  profile.photo ||
+                  'https://ui-avatars.com/api/?name=My+Profile&background=7c3aed&color=fff'
+                "
+                alt="Profile"
+                class="h-full w-full rounded-full border-4 border-violet-100 object-cover"
+              />
+              <span
+                class="absolute bottom-0 right-0 h-5 w-5 rounded-full border-4 border-white bg-green-500"
+              ></span>
+            </div>
+
+            <h2 class="text-base font-extrabold text-gray-900">
+              {{ profile.name || 'Your Account' }}
+            </h2>
+            <p class="mt-1 text-xs text-gray-500">
+              {{ profile.username ? '@' + profile.username : 'Customize your Socially experience' }}
+            </p>
+          </div>
+
+          <!-- SETTINGS MENU -->
+          <div class="space-y-1 p-3">
+            <button
+              type="button"
+              (click)="changeSection('account')"
+              [class.bg-violet-50]="activeSection === 'account'"
+              [class.text-violet-700]="activeSection === 'account'"
+              [class.text-gray-600]="activeSection !== 'account'"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition hover:bg-violet-50 hover:text-violet-700"
+            >
+              <i class="fa-regular fa-user w-5 text-center"></i>
+              Account Settings
+              @if (activeSection === 'account') {
+                <i class="fa-solid fa-chevron-right ml-auto text-xs"></i>
+              }
+            </button>
+
+            <button
+              type="button"
+              (click)="changeSection('security')"
+              [class.bg-violet-50]="activeSection === 'security'"
+              [class.text-violet-700]="activeSection === 'security'"
+              [class.text-gray-600]="activeSection !== 'security'"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition hover:bg-violet-50 hover:text-violet-700"
+            >
+              <i class="fa-solid fa-lock w-5 text-center"></i>
+              Privacy & Security
+              @if (activeSection === 'security') {
+                <i class="fa-solid fa-chevron-right ml-auto text-xs"></i>
+              }
+            </button>
+
+            <button
+              type="button"
+              (click)="changeSection('notifications')"
+              [class.bg-violet-50]="activeSection === 'notifications'"
+              [class.text-violet-700]="activeSection === 'notifications'"
+              [class.text-gray-600]="activeSection !== 'notifications'"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition hover:bg-violet-50 hover:text-violet-700"
+            >
+              <i class="fa-regular fa-bell w-5 text-center"></i>
+              Notifications
+              @if (activeSection === 'notifications') {
+                <i class="fa-solid fa-chevron-right ml-auto text-xs"></i>
+              }
+            </button>
+
+            <button
+              type="button"
+              (click)="changeSection('appearance')"
+              [class.bg-violet-50]="activeSection === 'appearance'"
+              [class.text-violet-700]="activeSection === 'appearance'"
+              [class.text-gray-600]="activeSection !== 'appearance'"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition hover:bg-violet-50 hover:text-violet-700"
+            >
+              <i class="fa-solid fa-palette w-5 text-center"></i>
+              Appearance
+              @if (activeSection === 'appearance') {
+                <i class="fa-solid fa-chevron-right ml-auto text-xs"></i>
+              }
+            </button>
+
+            <button
+              type="button"
+              (click)="changeSection('blocked')"
+              [class.bg-violet-50]="activeSection === 'blocked'"
+              [class.text-violet-700]="activeSection === 'blocked'"
+              [class.text-gray-600]="activeSection !== 'blocked'"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold transition hover:bg-violet-50 hover:text-violet-700"
+            >
+              <i class="fa-solid fa-user-slash w-5 text-center"></i>
+              Blocked Users
+              @if (activeSection === 'blocked') {
+                <i class="fa-solid fa-chevron-right ml-auto text-xs"></i>
+              }
+            </button>
+          </div>
+
+          <!-- LOGOUT -->
+          <div class="border-t border-gray-100 p-3">
+            <button
+              type="button"
+              (click)="logout()"
+              class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+            >
+              <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+              Log Out
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="lg:col-span-8 xl:col-span-9">
+        <div
+          class="min-h-[550px] overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm"
+        >
+          <!-- ACCOUNT SETTINGS -->
+          @if (activeSection === 'account') {
+            <div>
+              <div class="border-b border-gray-100 px-6 py-6 sm:px-8">
+                <h2 class="text-xl font-extrabold text-gray-900">Account Settings</h2>
+                <p class="mt-1 text-sm text-gray-500">
+                  Update your personal information and profile details
+                </p>
+              </div>
+
+              <div class="space-y-7 p-6 sm:p-8">
+                @if (isLoading) {
+                  <div
+                    class="flex items-center gap-3 rounded-xl bg-violet-50 p-4 text-sm font-semibold text-violet-700"
+                  >
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Loading your profile...
+                  </div>
+                }
+
+                <!-- PROFILE PHOTO -->
+                <div>
+                  <h3 class="mb-4 text-sm font-extrabold text-gray-800">Profile Photo</h3>
+
+                  <div class="flex flex-wrap items-center gap-5">
+                    <img
+                      [src]="
+                        previewPhoto ||
+                        profile.photo ||
+                        'https://ui-avatars.com/api/?name=My+Profile&background=7c3aed&color=fff'
+                      "
+                      alt="Profile"
+                      class="h-20 w-20 rounded-full border-4 border-violet-100 object-cover"
+                    />
+
+                    <div class="flex-1">
+                      <p class="text-sm font-bold text-gray-800">Your profile picture</p>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Choose a photo that represents you (Max 5MB)
+                      </p>
+
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        <label
+                          class="inline-flex cursor-pointer items-center rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-violet-700"
+                        >
+                          <i class="fa-solid fa-camera mr-2"></i>
+                          Choose Photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                            (change)="onPhotoSelected($event)"
+                          />
+                        </label>
+
+                        @if (selectedPhoto) {
+                          <button
+                            type="button"
+                            (click)="uploadPhoto()"
+                            [disabled]="isUploadingPhoto"
+                            class="rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-green-700 disabled:opacity-60"
+                          >
+                            @if (isUploadingPhoto) {
+                              <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                              Uploading...
+                            } @else {
+                              <i class="fa-solid fa-upload mr-2"></i>
+                              Upload Photo
+                            }
+                          </button>
+
+                          <button
+                            type="button"
+                            (click)="cancelPhotoSelection()"
+                            [disabled]="isUploadingPhoto"
+                            class="rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                          >
+                            Cancel
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                <!-- PERSONAL INFORMATION -->
+                <div>
+                  <h3 class="mb-5 text-sm font-extrabold text-gray-800">Personal Information</h3>
+
+                  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                      <label class="mb-2 block text-sm font-semibold text-gray-700"
+                        >Full Name</label
+                      >
+                      <input
+                        type="text"
+                        [(ngModel)]="profile.name"
+                        placeholder="Enter your full name"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="mb-2 block text-sm font-semibold text-gray-700">Username</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="profile.username"
+                        placeholder="Enter your username"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="mb-2 block text-sm font-semibold text-gray-700"
+                        >Email Address</label
+                      >
+                      <input
+                        type="email"
+                        [(ngModel)]="profile.email"
+                        placeholder="Enter your email"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="mb-2 block text-sm font-semibold text-gray-700"
+                        >Phone Number</label
+                      >
+                      <input
+                        type="tel"
+                        [(ngModel)]="profile.phone"
+                        placeholder="Phone number not available"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                <!-- BIO -->
+                <div>
+                  <h3 class="mb-2 text-sm font-extrabold text-gray-800">About You</h3>
+                  <textarea
+                    rows="4"
+                    [(ngModel)]="profile.about"
+                    placeholder="Write something about yourself..."
+                    class="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                  ></textarea>
+                </div>
+
+                <!-- SAVE BUTTONS -->
+                <div class="flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-6">
+                  <button
+                    type="button"
+                    (click)="cancelChanges()"
+                    class="rounded-xl border border-gray-200 px-5 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="saveChanges()"
+                    class="rounded-xl bg-violet-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-violet-200 transition hover:bg-violet-700"
+                  >
+                    <i class="fa-solid fa-check mr-2"></i>
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- SECURITY -->
+
+          <!-- SECURITY -->
+          @if (activeSection === 'security') {
+            <div class="p-6 sm:p-8">
+              <div class="border-b border-gray-100 pb-6">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-600"
+                  >
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                  </div>
+
+                  <div>
+                    <h2 class="text-xl font-extrabold text-gray-900">Privacy & Security</h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                      Manage your password and protect your account.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-8 max-w-2xl">
+                <div class="mb-6">
+                  <h3 class="text-lg font-extrabold text-gray-900">Change Password</h3>
+
+                  <p class="mt-1 text-sm text-gray-500">
+                    Choose a strong password to keep your account secure.
+                  </p>
+                </div>
+
+                <form
+                  [formGroup]="changePasswordForm"
+                  (ngSubmit)="changePassword()"
+                  class="space-y-5"
+                >
+                  <!-- CURRENT PASSWORD -->
+                  <div>
+                    <label class="mb-2 block text-sm font-bold text-gray-700">
+                      Current Password
+                    </label>
+
+                    <div class="relative">
+                      <input
+                        [type]="showCurrentPassword ? 'text' : 'password'"
+                        formControlName="password"
+                        placeholder="Enter your current password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-12 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+
+                      <button
+                        type="button"
+                        (click)="showCurrentPassword = !showCurrentPassword"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-violet-600"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class.fa-eye]="!showCurrentPassword"
+                          [class.fa-eye-slash]="showCurrentPassword"
+                        ></i>
+                      </button>
+                    </div>
+
+                    @if (
+                      passwordControls.password.touched &&
+                      passwordControls.password.hasError('required')
+                    ) {
+                      <p class="mt-2 text-xs font-semibold text-red-500">
+                        Current password is required.
+                      </p>
+                    }
+                  </div>
+
+                  <!-- NEW PASSWORD -->
+                  <div>
+                    <label class="mb-2 block text-sm font-bold text-gray-700"> New Password </label>
+
+                    <div class="relative">
+                      <input
+                        [type]="showNewPassword ? 'text' : 'password'"
+                        formControlName="newPassword"
+                        placeholder="Enter your new password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-12 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+
+                      <button
+                        type="button"
+                        (click)="showNewPassword = !showNewPassword"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-violet-600"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class.fa-eye]="!showNewPassword"
+                          [class.fa-eye-slash]="showNewPassword"
+                        ></i>
+                      </button>
+                    </div>
+
+                    <!-- PASSWORD REQUIREMENTS -->
+                    @if (showPasswordRequirements) {
+                      <div class="mt-3 space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-4">
+                        <p class="mb-2 text-xs font-bold text-gray-600">Password requirements:</p>
+
+                        @for (requirement of passwordRequirements; track requirement.label) {
+                          <p
+                            class="flex items-center gap-2 text-xs font-semibold"
+                            [class.text-green-600]="requirement.valid"
+                            [class.text-red-500]="!requirement.valid"
+                          >
+                            <i
+                              class="fa-solid"
+                              [class.fa-circle-check]="requirement.valid"
+                              [class.fa-circle-xmark]="!requirement.valid"
+                            ></i>
+
+                            {{ requirement.label }}
+                          </p>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- CONFIRM PASSWORD -->
+
+                  <!-- CONFIRM PASSWORD -->
+                  <div>
+                    <label class="mb-2 block text-sm font-bold text-gray-700">
+                      Confirm New Password
+                    </label>
+
+                    <div class="relative">
+                      <input
+                        [type]="showConfirmPassword ? 'text' : 'password'"
+                        formControlName="confirmPassword"
+                        placeholder="Confirm your new password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-12 text-sm outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                      />
+
+                      <button
+                        type="button"
+                        (click)="showConfirmPassword = !showConfirmPassword"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-violet-600"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class.fa-eye]="!showConfirmPassword"
+                          [class.fa-eye-slash]="showConfirmPassword"
+                        ></i>
+                      </button>
+                    </div>
+
+                    @if (
+                      passwordControls.confirmPassword.dirty &&
+                      passwordControls.confirmPassword.value
+                    ) {
+                      @if (changePasswordForm.hasError('passwordMismatch')) {
+                        <p class="mt-2 text-xs font-semibold text-red-500">
+                          <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                          Passwords do not match.
+                        </p>
+                      } @else if (
+                        passwordControls.confirmPassword.valid && passwordControls.newPassword.valid
+                      ) {
+                        <p class="mt-2 text-xs font-semibold text-green-600">
+                          <i class="fa-solid fa-circle-check mr-1"></i>
+                          Passwords match.
+                        </p>
+                      }
+                    }
+                  </div>
+
+                  <!-- PASSWORD INFO -->
+
+                  <!-- PASSWORD INFO -->
+                  @if (showPasswordRequirements) {
+                    <div class="rounded-2xl border border-violet-100 bg-violet-50 p-4">
+                      <div class="flex items-center gap-2 text-violet-700">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span class="text-sm font-bold"> Password Security Tips </span>
+                      </div>
+
+                      <ul class="mt-3 space-y-2 text-xs text-violet-700">
+                        <li>• At least 8 characters.</li>
+                        <li>• One uppercase and one lowercase letter.</li>
+                        <li>• At least one number.</li>
+                        <li>• At least one special character.</li>
+                      </ul>
+                    </div>
+                  }
+
+                  <!-- ACTIONS -->
+                  <div class="flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-6">
+                    <button
+                      type="button"
+                      (click)="resetPasswordForm()"
+                      [disabled]="isChangingPassword"
+                      class="rounded-xl border border-gray-200 px-5 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      [disabled]="isChangingPassword"
+                      class="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:from-violet-700 hover:to-fuchsia-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      @if (isChangingPassword) {
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        Updating...
+                      } @else {
+                        <i class="fa-solid fa-lock"></i>
+                        Update Password
+                      }
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          }
+
+          <!-- NOTIFICATIONS -->
+          @if (activeSection === 'notifications') {
+            <div class="p-6 sm:p-8">
+              <h2 class="text-xl font-extrabold text-gray-900">Notifications</h2>
+              <p class="mt-2 text-sm text-gray-500">Choose how you want to receive updates.</p>
+
+              <div class="mt-8 space-y-4">
+                @for (
+                  item of [
+                    { title: 'Likes', description: 'When someone likes your posts' },
+                    { title: 'Comments', description: 'When someone comments on your posts' },
+                    { title: 'New Followers', description: 'When someone follows you' },
+                  ];
+                  track item.title
+                ) {
+                  <div
+                    class="flex items-center justify-between rounded-2xl border border-gray-100 p-5"
+                  >
+                    <div>
+                      <h3 class="font-bold text-gray-800">{{ item.title }}</h3>
+                      <p class="mt-1 text-xs text-gray-500">{{ item.description }}</p>
+                    </div>
+                    <span class="text-xs font-semibold text-violet-600">Coming soon</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- APPEARANCE -->
+          @if (activeSection === 'appearance') {
+            <div class="p-6 sm:p-8">
+              <h2 class="text-xl font-extrabold text-gray-900">Appearance</h2>
+              <p class="mt-2 text-sm text-gray-500">
+                Personalize how Socially looks on your device.
+              </p>
+
+              <div class="mt-8 grid gap-5 sm:grid-cols-2">
+                <!-- LIGHT MODE -->
+                <button
+                  type="button"
+                  (click)="setTheme('light')"
+                  class="rounded-2xl border-2 p-6 text-left transition hover:shadow-md"
+                  [class.border-violet-500]="currentTheme === 'light'"
+                  [class.bg-violet-50]="currentTheme === 'light'"
+                  [class.border-gray-200]="currentTheme !== 'light'"
+                  [class.bg-white]="currentTheme !== 'light'"
+                >
+                  <div class="flex items-center justify-between">
+                    <div
+                      class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-500"
+                    >
+                      <i class="fa-solid fa-sun text-2xl"></i>
+                    </div>
+
+                    @if (currentTheme === 'light') {
+                      <i class="fa-solid fa-circle-check text-xl text-violet-600"></i>
+                    }
+                  </div>
+
+                  <h3 class="mt-5 font-extrabold text-gray-900">Light Mode</h3>
+                  <p class="mt-2 text-sm text-gray-500">A clean and bright experience.</p>
+
+                  <span class="mt-4 inline-block text-xs font-bold text-violet-600">
+                    {{ currentTheme === 'light' ? 'Currently Active' : 'Switch to Light' }}
+                  </span>
+                </button>
+
+                <!-- DARK MODE -->
+                <button
+                  type="button"
+                  (click)="setTheme('dark')"
+                  class="rounded-2xl border-2 p-6 text-left transition hover:shadow-md"
+                  [class.border-violet-500]="currentTheme === 'dark'"
+                  [class.bg-violet-50]="currentTheme === 'dark'"
+                  [class.border-gray-200]="currentTheme !== 'dark'"
+                  [class.bg-white]="currentTheme !== 'dark'"
+                >
+                  <div class="flex items-center justify-between">
+                    <div
+                      class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800 text-white"
+                    >
+                      <i class="fa-solid fa-moon text-2xl"></i>
+                    </div>
+
+                    @if (currentTheme === 'dark') {
+                      <i class="fa-solid fa-circle-check text-xl text-violet-600"></i>
+                    }
+                  </div>
+
+                  <h3 class="mt-5 font-extrabold text-gray-900">Dark Mode</h3>
+                  <p class="mt-2 text-sm text-gray-500">A comfortable dark experience.</p>
+
+                  <span class="mt-4 inline-block text-xs font-bold text-violet-600">
+                    {{ currentTheme === 'dark' ? 'Currently Active' : 'Switch to Dark' }}
+                  </span>
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- BLOCKED USERS -->
+          @if (activeSection === 'blocked') {
+            <div class="p-6 sm:p-8">
+              <h2 class="text-xl font-extrabold text-gray-900">Blocked Users</h2>
+              <p class="mt-2 text-sm text-gray-500">Manage the people you have blocked.</p>
+
+              <div class="mt-12 flex flex-col items-center justify-center text-center">
+                <div
+                  class="flex h-20 w-20 items-center justify-center rounded-full bg-violet-50 text-3xl text-violet-500"
+                >
+                  <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <h3 class="mt-5 text-lg font-extrabold text-gray-800">No blocked users</h3>
+                <p class="mt-2 max-w-sm text-sm text-gray-500">
+                  Users you block will appear here so you can manage them.
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

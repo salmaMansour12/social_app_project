@@ -1,0 +1,837 @@
+
+<div class="min-h-screen bg-[#f0f2f5] px-4 py-6 md:px-8">
+  <div class="mx-auto max-w-6xl space-y-6">
+
+    <!-- PROFILE HEADER -->
+    <section class="overflow-hidden rounded-3xl bg-white shadow-sm">
+      <div class="relative h-56 bg-gradient-to-r from-violet-700 via-purple-600 to-fuchsia-500 md:h-72">
+        <div
+          class="absolute inset-0 opacity-20"
+          style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 24px 24%;">
+        </div>
+      </div>
+
+      <div class="px-5 pb-6 md:px-8">
+        <div class="flex flex-col gap-5 md:flex-row md:items-end">
+
+          <!-- PROFILE PHOTO -->
+          <div class="-mt-16 flex flex-col items-center md:items-start">
+            <div class="group relative">
+              <img
+                [src]="selectedPhotoPreview || profilePhoto"
+                alt="Profile"
+                class="h-36 w-36 rounded-full border-[6px] border-white object-cover shadow-lg">
+
+              <label
+                for="profilePhotoInput"
+                title="Change profile photo"
+                class="absolute bottom-2 right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-violet-600 text-white shadow-lg transition hover:bg-violet-700">
+                <i class="fa-solid fa-camera"></i>
+              </label>
+
+              <input
+                id="profilePhotoInput"
+                type="file"
+                accept="image/*"
+                hidden
+                (change)="onProfilePhotoSelected($event)">
+            </div>
+
+            @if (selectedPhotoPreview) {
+              <div class="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="uploadProfilePhoto()"
+                  [disabled]="isUploadingPhoto"
+                  class="rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white shadow transition hover:bg-violet-700 disabled:opacity-50">
+                  @if (isUploadingPhoto) {
+                    <i class="fa-solid fa-spinner fa-spin mr-1"></i>
+                    Uploading...
+                  } @else {
+                    <i class="fa-solid fa-check mr-1"></i>
+                    Save Photo
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  (click)="cancelPhotoChange()"
+                  class="rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100">
+                  Cancel
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- PROFILE INFO -->
+          <div class="flex-1 text-center md:pb-3 md:text-left">
+            <h1 class="text-2xl font-extrabold text-gray-800 md:text-3xl">
+              {{ profileName }}
+            </h1>
+            <p class="mt-2 text-sm text-gray-500">
+              Welcome to your profile
+            </p>
+          </div>
+        </div>
+
+        <!-- PROFILE STATS -->
+        <div class="mt-6 grid grid-cols-3 gap-3 border-t border-gray-100 pt-5 text-center">
+          <div>
+            <p class="text-2xl font-extrabold text-violet-700">
+              {{ postsCount }}
+            </p>
+            <p class="text-sm text-gray-500">Posts</p>
+          </div>
+
+          <div>
+            <p class="text-2xl font-extrabold text-violet-700">
+              {{ sharedPostsCount }}
+            </p>
+            <p class="text-sm text-gray-500">Shares</p>
+          </div>
+
+          <div>
+            <p class="text-2xl font-extrabold text-violet-700">
+              {{ photosCount }}
+            </p>
+            <p class="text-sm text-gray-500">Photos</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE CONTENT -->
+    <section class="rounded-3xl bg-white p-5 shadow-sm">
+
+      <!-- TABS -->
+      <div class="mb-6 flex gap-3 overflow-x-auto border-b border-gray-100">
+        <button
+          type="button"
+          (click)="changeTab('posts')"
+          [class.border-violet-600]="activeTab() === 'posts'"
+          [class.text-violet-700]="activeTab() === 'posts'"
+          class="whitespace-nowrap border-b-2 border-transparent px-5 py-3 font-semibold text-gray-500">
+          <i class="fa-solid fa-newspaper mr-2"></i>
+          Posts
+        </button>
+
+        <button
+          type="button"
+          (click)="changeTab('about')"
+          [class.border-violet-600]="activeTab() === 'about'"
+          [class.text-violet-700]="activeTab() === 'about'"
+          class="whitespace-nowrap border-b-2 border-transparent px-5 py-3 font-semibold text-gray-500">
+          <i class="fa-solid fa-user mr-2"></i>
+          About
+        </button>
+
+        <button
+          type="button"
+          (click)="changeTab('photos')"
+          [class.border-violet-600]="activeTab() === 'photos'"
+          [class.text-violet-700]="activeTab() === 'photos'"
+          class="whitespace-nowrap border-b-2 border-transparent px-5 py-3 font-semibold text-gray-500">
+          <i class="fa-solid fa-images mr-2"></i>
+          Photos
+        </button>
+      </div>
+
+      <!-- LOADING -->
+      @if (isLoading()) {
+        <div class="flex flex-col items-center py-16 text-gray-400">
+          <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-violet-600"></i>
+          <p>Loading your posts...</p>
+        </div>
+      }
+
+      @else if (errorMessage) {
+        <div class="rounded-2xl bg-red-50 p-5 text-center text-red-600">
+          {{ errorMessage }}
+          <button
+            type="button"
+            (click)="getMyPosts()"
+            class="ml-2 font-bold underline">
+            Try again
+          </button>
+        </div>
+      }
+
+      <!-- POSTS TAB -->
+      @else if (activeTab() === 'posts') {
+        <div class="mx-auto max-w-3xl space-y-5">
+
+          <!-- CREATE POST -->
+          <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center gap-3">
+              <img
+                [src]="profilePhoto"
+                alt="Profile"
+                class="h-11 w-11 rounded-full object-cover">
+
+              <div>
+                <h3 class="font-semibold text-gray-900">
+                  {{ profileName }}
+                </h3>
+                <p class="text-xs text-gray-500">
+                  Share something with your friends
+                </p>
+              </div>
+            </div>
+
+            <textarea
+              [(ngModel)]="newPostBody"
+              rows="3"
+              placeholder="What's on your mind?"
+              class="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100">
+            </textarea>
+
+            @if (newPostImagePreview) {
+              <div class="relative mt-4">
+                <img
+                  [src]="newPostImagePreview"
+                  alt="Post preview"
+                  class="max-h-80 w-full rounded-xl object-cover">
+
+                <button
+                  type="button"
+                  (click)="removePostImage()"
+                  class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white hover:bg-red-600">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            }
+
+            <div class="mt-4 flex items-center justify-between gap-3">
+              <label
+                class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-violet-50 hover:text-violet-600">
+                <i class="fa-regular fa-image text-lg"></i>
+                Photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  (change)="onPostImageSelected($event)">
+              </label>
+
+              <button
+                type="button"
+                (click)="createProfilePost()"
+                [disabled]="isCreatingPost || (!newPostBody.trim() && !newPostImage)"
+                class="rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50">
+                @if (isCreatingPost) {
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                  Publishing...
+                } @else {
+                  <i class="fa-solid fa-paper-plane mr-2"></i>
+                  Publish Post
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- EMPTY STATE -->
+          @if (myPosts().length === 0) {
+            <div class="rounded-2xl border border-gray-100 bg-white py-16 text-center">
+              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-violet-50 text-violet-500">
+                <i class="fa-solid fa-newspaper text-2xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800">
+                No posts yet
+              </h3>
+              <p class="mt-2 text-sm text-gray-500">
+                Share your first post with your friends!
+              </p>
+            </div>
+          }
+
+          <!-- POSTS LIST -->
+          @else {
+            @for (post of myPosts(); track post._id) {
+              <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+                <!-- POST HEADER -->
+                <div class="flex items-center justify-between p-4">
+                  <div class="flex items-center gap-3">
+                    <img
+                      [src]="profilePhoto"
+                      alt="Profile"
+                      class="h-11 w-11 rounded-full object-cover">
+
+                    <div>
+                      <h3 class="font-bold text-gray-800">
+                        {{ profileName }}
+                      </h3>
+                      <p class="text-xs text-gray-400">
+                        {{ post.createdAt | date:'medium' }}
+                      </p>
+                      @if (post.isShare) {
+                        <p class="mt-1 text-xs text-violet-600">
+                          <i class="fa-solid fa-share mr-1"></i>
+                          Shared a post
+                        </p>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- EDIT / DELETE -->
+                  <div class="flex items-center gap-2">
+                    @if (!post.isShare) {
+                      <button
+                        type="button"
+                        (click)="startEditPost(post)"
+                        title="Edit post"
+                        class="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-violet-50 hover:text-violet-600">
+                        <i class="fa-solid fa-pen"></i>
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        (click)="startEditShare(post)"
+                        title="Edit share caption"
+                        class="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-violet-50 hover:text-violet-600">
+                        <i class="fa-solid fa-pen"></i>
+                      </button>
+                    }
+
+                    <button
+                      type="button"
+                      (click)="confirmDeletePost(post)"
+                      title="Delete post"
+                      class="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-50 hover:text-red-600">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- EDIT ORIGINAL POST -->
+                @if (!post.isShare && editingPostId === post._id) {
+                  <div class="px-4 pb-4">
+                    <textarea
+                      [(ngModel)]="editingPostContent"
+                      rows="4"
+                      placeholder="Edit your post..."
+                      class="w-full resize-none rounded-xl border border-violet-200 bg-gray-50 p-4 text-sm text-gray-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100">
+                    </textarea>
+
+                    <div class="mt-3 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="cancelEditPost()"
+                        class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="savePost(post)"
+                        [disabled]="isUpdatingPost"
+                        class="rounded-xl bg-violet-600 px-5 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50">
+                        @if (isUpdatingPost) {
+                          <i class="fa-solid fa-spinner fa-spin mr-1"></i>
+                          Saving...
+                        } @else {
+                          Save Changes
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- EDIT SHARE CAPTION -->
+                @else if (post.isShare && editingShareId === post._id) {
+                  <div class="px-4 pb-4">
+                    <label class="mb-2 block text-sm font-semibold text-violet-700">
+                      Edit your share caption
+                    </label>
+
+                    <textarea
+                      [(ngModel)]="editingShareCaption"
+                      rows="4"
+                      placeholder="Write your caption..."
+                      class="w-full resize-none rounded-xl border border-violet-200 bg-gray-50 p-4 text-sm text-gray-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100">
+                    </textarea>
+
+                    <div class="mt-3 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="cancelEditShare()"
+                        class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="saveShareCaption(post)"
+                        [disabled]="isUpdatingShare"
+                        class="rounded-xl bg-violet-600 px-5 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50">
+                        @if (isUpdatingShare) {
+                          <i class="fa-solid fa-spinner fa-spin mr-1"></i>
+                          Saving...
+                        } @else {
+                          Save Caption
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                @else {
+                  <!-- POST CAPTION -->
+                  @if (post.body) {
+                    <div class="px-4 pb-4">
+                      <p class="whitespace-pre-wrap break-words text-sm leading-7 text-gray-700">
+                        {{ post.body }}
+                      </p>
+                    </div>
+                  }
+
+                  <!-- POST IMAGE -->
+                  @if (post.image && !post.isShare) {
+                    <img
+                      [src]="post.image"
+                      alt="Post image"
+                      class="max-h-[500px] w-full object-cover">
+                  }
+
+                  <!-- SHARED POST CONTENT -->
+                  @if (post.isShare && post.sharedPost) {
+                    <div class="mx-4 mb-4 overflow-hidden rounded-xl border border-gray-200">
+
+                      <div class="flex items-center gap-2 bg-gray-50 p-3">
+                        <i class="fa-solid fa-share text-violet-600"></i>
+                        <span class="text-xs font-semibold text-gray-500">
+                          Original post
+                        </span>
+                      </div>
+
+                      <div class="p-4">
+                        <div class="mb-3 flex items-center gap-2">
+                          <img
+                            [src]="post.sharedPost.user?.photo || 'https://ui-avatars.com/api/?name=User'"
+                            alt="Original author"
+                            class="h-9 w-9 rounded-full object-cover">
+
+                          <p class="text-sm font-bold text-gray-800">
+                            {{ post.sharedPost.user?.name || 'Original author' }}
+                          </p>
+                        </div>
+
+                        <p class="whitespace-pre-wrap break-words text-sm leading-7 text-gray-700">
+                          {{ post.sharedPost.body }}
+                        </p>
+
+                        @if (post.sharedPost.image) {
+                          <img
+                            [src]="post.sharedPost.image"
+                            alt="Shared post image"
+                            class="mt-3 max-h-80 w-full rounded-xl object-cover">
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+
+                <!-- POST COUNTS -->
+                <div class="flex items-center justify-between border-t border-gray-100 px-4 py-3 text-xs text-gray-500">
+                  <span>
+                    <i class="fa-solid fa-heart mr-1 text-rose-500"></i>
+                    {{ post.likes?.length || 0 }} Likes
+                  </span>
+
+                  <span>
+                    <i class="fa-regular fa-comment mr-1"></i>
+                    {{ post.commentsCount || 0 }} Comments
+                  </span>
+
+                  @if (post.sharesCount) {
+                    <span>
+                      <i class="fa-solid fa-share mr-1"></i>
+                      {{ post.sharesCount }} Shares
+                    </span>
+                  }
+                </div>
+
+                <!-- POST ACTIONS -->
+                <div class="grid grid-cols-4 border-t border-gray-100">
+
+                  <!-- LIKE -->
+                  <button
+                    type="button"
+                    (click)="toggleLike(post)"
+                    [disabled]="likingPosts()[post._id]"
+                    class="flex items-center justify-center gap-2 py-3 text-sm font-semibold transition hover:bg-violet-50"
+                    [class.text-rose-600]="isLiked(post)"
+                    [class.text-gray-500]="!isLiked(post)">
+                    <i
+                      class="fa-heart"
+                      [class.fa-solid]="isLiked(post)"
+                      [class.fa-regular]="!isLiked(post)">
+                    </i>
+                    <span>Like</span>
+                  </button>
+
+                  <!-- BOOKMARK -->
+                  <button
+                    type="button"
+                    (click)="toggleBookmark(post)"
+                    [disabled]="bookmarkingPosts()[post._id]"
+                    class="flex items-center justify-center gap-2 border-x border-gray-100 py-3 text-sm font-semibold text-gray-500 transition hover:bg-violet-50 hover:text-violet-600">
+                    <i
+                      class="fa-bookmark"
+                      [class.fa-solid]="post.bookmarked"
+                      [class.fa-regular]="!post.bookmarked">
+                    </i>
+                    <span>Save</span>
+                  </button>
+
+                  <!-- SHARE -->
+                  <button
+                    type="button"
+                    (click)="startShare(post)"
+                    class="flex items-center justify-center gap-2 border-r border-gray-100 py-3 text-sm font-semibold text-gray-500 transition hover:bg-violet-50 hover:text-violet-600">
+                    <i class="fa-solid fa-share"></i>
+                    <span>Share</span>
+                  </button>
+
+                  <!-- COMMENTS -->
+                  <button
+                    type="button"
+                    (click)="openComments(post._id)"
+                    class="flex items-center justify-center gap-2 py-3 text-sm font-semibold text-gray-500 transition hover:bg-violet-50 hover:text-violet-600">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>Comment</span>
+                  </button>
+                </div>
+
+                <!-- SHARE COMPOSER -->
+                @if (sharingPostId === post._id) {
+                  <div class="border-t border-gray-100 bg-violet-50/50 p-4">
+                    <div class="mb-3 flex items-center gap-2">
+                      <img
+                        [src]="profilePhoto"
+                        alt="Your profile"
+                        class="h-10 w-10 rounded-full object-cover">
+
+                      <div>
+                        <p class="text-sm font-bold text-gray-800">
+                          {{ profileName }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Sharing this post
+                        </p>
+                      </div>
+                    </div>
+
+                    <textarea
+                      [(ngModel)]="shareCaption"
+                      rows="3"
+                      placeholder="Say something about this post..."
+                      class="w-full resize-none rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-800 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100">
+                    </textarea>
+
+                    <!-- SHARED POST PREVIEW -->
+                    <div class="mt-3 rounded-xl border border-gray-200 bg-white p-3">
+                      <p class="mb-2 text-xs font-semibold text-gray-500">
+                        <i class="fa-solid fa-share mr-1 text-violet-600"></i>
+                        Original post preview
+                      </p>
+
+                      <p class="text-sm font-bold text-gray-800">
+                        {{ profileName }}
+                      </p>
+
+                      <p class="mt-1 line-clamp-3 text-sm text-gray-600">
+                        {{ post.body || 'Photo post' }}
+                      </p>
+
+                      @if (post.image) {
+                        <img
+                          [src]="post.image"
+                          alt="Post preview"
+                          class="mt-2 max-h-48 w-full rounded-lg object-cover">
+                      }
+                    </div>
+
+                    <div class="mt-3 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="cancelShare()"
+                        [disabled]="isSharing"
+                        class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="confirmShare(post)"
+                        [disabled]="isSharing"
+                        class="rounded-xl bg-violet-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-50">
+                        @if (isSharing) {
+                          <i class="fa-solid fa-spinner fa-spin mr-1"></i>
+                          Sharing...
+                        } @else {
+                          <i class="fa-solid fa-share mr-1"></i>
+                          Share Now
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- COMMENTS SECTION -->
+                @if (selectedPostId() === post._id) {
+                  <div class="border-t border-gray-100 bg-gray-50 p-4">
+                    <h4 class="mb-4 font-bold text-gray-800">
+                      Comments
+                    </h4>
+
+                    <!-- ADD COMMENT -->
+                    <div class="mb-5 flex items-center gap-2">
+                      <img
+                        [src]="profilePhoto"
+                        alt="Profile"
+                        class="h-9 w-9 rounded-full object-cover">
+
+                      <input
+                        type="text"
+                        [(ngModel)]="commentContent[post._id]"
+                        (keyup.enter)="addComment(post._id)"
+                        placeholder="Write a comment..."
+                        class="min-w-0 flex-1 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-400">
+
+                      <button
+                        type="button"
+                        (click)="addComment(post._id)"
+                        [disabled]="sendingComment()[post._id] || !commentContent[post._id]?.trim()"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white transition hover:bg-violet-700 disabled:opacity-50">
+                        @if (sendingComment()[post._id]) {
+                          <i class="fa-solid fa-spinner fa-spin"></i>
+                        } @else {
+                          <i class="fa-solid fa-paper-plane"></i>
+                        }
+                      </button>
+                    </div>
+
+                    <!-- COMMENTS LOADING -->
+                    @if (loadingComments()[post._id]) {
+                      <div class="py-5 text-center text-sm text-gray-400">
+                        <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                        Loading comments...
+                      </div>
+                    }
+
+                    @else {
+                      @if ((commentsByPost()[post._id] || []).length === 0) {
+                        <p class="py-4 text-center text-sm text-gray-400">
+                          No comments yet. Be the first to comment!
+                        </p>
+                      }
+
+                      @else {
+                        <div class="space-y-4">
+                          @for (comment of commentsByPost()[post._id]; track comment._id) {
+                            <div class="flex gap-3">
+                              <img
+                                [src]="$any(comment).commentCreator?.photo || 'https://ui-avatars.com/api/?name=User'"
+                                alt="Comment author"
+                                class="h-9 w-9 shrink-0 rounded-full object-cover">
+
+                              <div class="min-w-0 flex-1 rounded-2xl bg-white p-3">
+                                <div class="mb-1 flex items-center justify-between gap-2">
+                                  <p class="text-sm font-bold text-gray-800">
+                                    {{ $any(comment).commentCreator?.name || 'User' }}
+                                  </p>
+
+                                  @if (isMyComment(comment)) {
+                                    <div class="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        (click)="startEditComment(comment)"
+                                        class="text-xs font-semibold text-violet-600 hover:underline">
+                                        Edit
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        (click)="deleteComment(post._id, comment._id)"
+                                        [disabled]="deletingCommentId === comment._id"
+                                        class="text-xs font-semibold text-red-500 hover:underline disabled:opacity-50">
+                                        @if (deletingCommentId === comment._id) {
+                                          <i class="fa-solid fa-spinner fa-spin"></i>
+                                        } @else {
+                                          Delete
+                                        }
+                                      </button>
+                                    </div>
+                                  }
+                                </div>
+
+                                <!-- EDIT COMMENT -->
+                                @if (editingCommentId === comment._id) {
+                                  <textarea
+                                    [(ngModel)]="editingCommentContent"
+                                    rows="2"
+                                    class="w-full rounded-xl border border-violet-200 p-2 text-sm outline-none focus:border-violet-500">
+                                  </textarea>
+
+                                  <div class="mt-2 flex justify-end gap-2">
+                                    <button
+                                      type="button"
+                                      (click)="cancelEditComment()"
+                                      class="text-xs font-semibold text-gray-500">
+                                      Cancel
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      (click)="saveComment(post._id, comment._id)"
+                                      class="text-xs font-semibold text-violet-600">
+                                      Save
+                                    </button>
+                                  </div>
+                                }
+
+                                @else {
+                                  <p class="whitespace-pre-wrap break-words text-sm leading-6 text-gray-600">
+                                    {{ comment.content }}
+                                  </p>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    }
+                  </div>
+                }
+              </article>
+            }
+          }
+        </div>
+      }
+
+      <!-- ABOUT TAB -->
+      @else if (activeTab() === 'about') {
+        <div class="rounded-2xl bg-gray-50 p-6">
+          <h3 class="mb-4 text-lg font-bold text-gray-800">
+            About Me
+          </h3>
+
+          <p class="text-sm text-gray-600">
+            <i class="fa-solid fa-user mr-2 text-violet-600"></i>
+            {{ profileName }}
+          </p>
+        </div>
+      }
+
+      <!-- PHOTOS TAB -->
+      @else if (activeTab() === 'photos') {
+        @if (photosCount === 0) {
+          <div class="py-16 text-center text-gray-400">
+            <i class="fa-solid fa-images mb-3 text-4xl"></i>
+            <p>No photos yet</p>
+          </div>
+        }
+
+        @else {
+          <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
+            @for (post of myPosts(); track post._id) {
+              @if (post.image) {
+                <img
+                  [src]="post.image"
+                  alt="My photo"
+                  class="aspect-square w-full rounded-xl object-cover">
+              }
+
+              @if (post.isShare && post.sharedPost?.image) {
+                <img
+                  [src]="post.sharedPost!.image!"
+                  alt="Shared photo"
+                  class="aspect-square w-full rounded-xl object-cover">
+              }
+            }
+          </div>
+        }
+      }
+    </section>
+  </div>
+</div>
+
+<!-- TOAST -->
+@if (toastMessage) {
+  <div
+    class="fixed right-5 top-5 z-[9999] flex max-w-sm items-center gap-3 rounded-2xl border p-4 shadow-xl"
+    [class.bg-green-50]="toastType === 'success'"
+    [class.border-green-200]="toastType === 'success'"
+    [class.text-green-700]="toastType === 'success'"
+    [class.bg-red-50]="toastType === 'error'"
+    [class.border-red-200]="toastType === 'error'"
+    [class.text-red-700]="toastType === 'error'">
+
+    <i
+      class="fa-solid text-xl"
+      [class.fa-circle-check]="toastType === 'success'"
+      [class.fa-circle-exclamation]="toastType === 'error'">
+    </i>
+
+    <span class="flex-1 text-sm font-semibold">
+      {{ toastMessage }}
+    </span>
+
+    <button
+      type="button"
+      (click)="toastMessage = ''">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+}
+
+<!-- DELETE CONFIRMATION -->
+@if (showDeleteConfirmation) {
+  <div class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/40 p-4">
+    <div class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
+      <div class="flex items-start gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-500">
+          <i class="fa-solid fa-trash-can text-lg"></i>
+        </div>
+
+        <div class="flex-1">
+          <h3 class="font-bold text-gray-800">
+            Confirm Delete
+          </h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Are you sure you want to delete this post? This action cannot be undone.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeDeleteConfirmation()">
+          <i class="fa-solid fa-xmark text-gray-400"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeDeleteConfirmation()"
+          class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="deleteConfirmed()"
+          [disabled]="isDeleting"
+          class="rounded-xl bg-red-500 px-5 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50">
+          @if (isDeleting) {
+            <i class="fa-solid fa-spinner fa-spin mr-1"></i>
+            Deleting...
+          } @else {
+            Delete
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
