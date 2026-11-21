@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { LoadingScreenComponent } from './../../shared/component/loading-screen/loading-screen/loading-screen.component';
+
 import { InputAppComponent } from '../../shared/component/input-app/input-app.component';
 import { FooterComponent } from '../footer/footer.component';
 import { AuthServiceService } from '../../core/auth/services/auth-service.service';
@@ -20,7 +20,7 @@ import { AuthServiceService } from '../../core/auth/services/auth-service.servic
     InputAppComponent,
     FooterComponent,
     ReactiveFormsModule,
-    LoadingScreenComponent,
+ 
   ],
   styleUrl: './login.component.css',
   templateUrl: './login.component.html',
