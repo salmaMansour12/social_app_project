@@ -15,7 +15,7 @@ import { FooterComponent } from '../footer/footer.component';
 export class RegisterComponent {
 message:string="I already have an account";
 linkText:string="Log in";
-linkUrl:string="login";
+linkUrl: string = "/login";
 
 
 private readonly authServiceService= inject(AuthServiceService) ;
@@ -44,7 +44,7 @@ navigateToLogin() {
     this.registerForm.markAllAsTouched();
 
   }
-  
+
 else{
   console.log("Form Submitted",this.registerForm.value);
   this.authServiceService.registerFormService(this.registerForm.value).subscribe({

@@ -20,7 +20,7 @@ import { AuthServiceService } from '../../core/auth/services/auth-service.servic
     InputAppComponent,
     FooterComponent,
     ReactiveFormsModule,
- 
+
   ],
   styleUrl: './login.component.css',
   templateUrl: './login.component.html',
@@ -28,7 +28,7 @@ import { AuthServiceService } from '../../core/auth/services/auth-service.servic
 export class LoginComponent {
   message: string = "I don't have an account? Sign up";
   linkText: string = 'Sign up';
-  linkUrl: string = 'register';
+linkUrl: string = '/register';;
 
   isLoding = false;
 

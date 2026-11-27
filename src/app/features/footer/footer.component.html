@@ -30,8 +30,12 @@
         </div>
 
         <p class="mt-6 text-center text-sm text-slate-500">
-          {{ message }}
-          <a href="{{ linkUrl }}" class="font-bold text-violet-700 hover:underline">
-            {{ linkText }}
-          </a>
-        </p>
+  {{ message }}
+
+  <a
+    [routerLink]="linkUrl"
+    class="font-bold text-violet-700 hover:underline"
+  >
+    {{ linkText }}
+  </a>
+</p>
